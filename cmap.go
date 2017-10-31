@@ -1,4 +1,5 @@
 package cmap
+//@formatter:off
 
 import (
     "sync"
@@ -10,21 +11,23 @@ type Map struct {
 }
 
 func (m *Map) Get(key string) bool {
-    m.RLock()
+    m.RLock(); defer m.RUnlock()
     var v = m.dict[key]
-    m.RUnlock()
     return v
 }
 
 func (m *Map) Set(key string, val bool) {
-    m.Lock()
+    m.Lock(); defer m.Unlock()
     m.dict[key] = val
-    m.Unlock()
 }
 
 func (m *Map) Size() int {
-    m.RLock()
+    m.RLock(); defer m.RUnlock()
     var v = len(m.dict)
-    m.RUnlock()
     return v
+}
+
+func (m *Map) Iter (fn func (k string , v bool))  {
+    m.Lock(); defer m.Unlock()
+    for k, v := range m.dict {fn(k, v)}
 }
