@@ -1,4 +1,5 @@
 package cmap
+
 //@formatter:off
 
 import (
@@ -7,18 +8,28 @@ import (
 
 type Map struct {
     sync.RWMutex
-    dict map[string]bool
+
+    dict map[string]struct{}
 }
 
-func (m *Map) Get(key string) bool {
+func NewMap() *Map {
+    return &Map{dict:make(map[string]struct{})}
+}
+
+func (m *Map) HasKey(key string) bool {
     m.RLock(); defer m.RUnlock()
-    var v = m.dict[key]
-    return v
+    var _, ok = m.dict[key]
+    return ok
 }
 
-func (m *Map) Set(key string, val bool) {
+func (m *Map) Set(key string) {
     m.Lock(); defer m.Unlock()
-    m.dict[key] = val
+    m.dict[key] = struct{}{}
+}
+
+func (m *Map) Delete(key string) {
+    m.Lock(); defer m.Unlock()
+    delete(m.dict, key)
 }
 
 func (m *Map) Size() int {
@@ -27,7 +38,12 @@ func (m *Map) Size() int {
     return v
 }
 
-func (m *Map) Iter (fn func (k string , v bool))  {
+
+func (m *Map) Keys () []string {
     m.Lock(); defer m.Unlock()
-    for k, v := range m.dict {fn(k, v)}
+    var keys = make([]string , m.Size())
+    for k := range m.dict {
+        keys = append(keys, k)
+    }
+    return keys
 }
