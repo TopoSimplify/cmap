@@ -1,4 +1,4 @@
-package cmap
+package x_cmap
 
 import "sync"
 
