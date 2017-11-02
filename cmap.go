@@ -1,14 +1,11 @@
 package cmap
 
-//@formatter:off
+import "sync"
 
-import (
-    "sync"
-)
+//@formatter:off
 
 type Map struct {
     sync.RWMutex
-
     dict map[string]struct{}
 }
 
@@ -17,33 +14,38 @@ func NewMap() *Map {
 }
 
 func (m *Map) HasKey(key string) bool {
-    m.RLock(); defer m.RUnlock()
+    m.RLock()
     var _, ok = m.dict[key]
+    m.RUnlock()
     return ok
 }
 
 func (m *Map) Set(key string) {
-    m.Lock(); defer m.Unlock()
+    m.Lock()
     m.dict[key] = struct{}{}
+    m.Unlock()
 }
 
 func (m *Map) Delete(key string) {
-    m.Lock(); defer m.Unlock()
+    m.Lock()
     delete(m.dict, key)
+    m.Unlock()
 }
 
 func (m *Map) Size() int {
-    m.RLock(); defer m.RUnlock()
+    m.RLock()
     var v = len(m.dict)
+    m.RUnlock()
     return v
 }
 
 
 func (m *Map) Keys () []string {
-    m.Lock(); defer m.Unlock()
+    m.Lock()
     var keys = make([]string , m.Size())
     for k := range m.dict {
         keys = append(keys, k)
     }
+    m.Unlock()
     return keys
 }
