@@ -1,9 +1,9 @@
 package cmap
 
 import (
-	"sync"
 	"github.com/TopoSimplify/node"
 	"sort"
+	"sync"
 )
 
 const CacheKeySize = 6
@@ -62,4 +62,3 @@ func CacheKey(a, b *node.Node) [CacheKeySize]int {
 	sort.Ints(o[:])
 	return o
 }
-
